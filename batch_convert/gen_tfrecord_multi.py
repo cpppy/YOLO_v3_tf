@@ -68,7 +68,7 @@ if __name__ == '__main__':
         pid_num=config.pid_num,
         train_data_dir=config.train_data_dir,
         tfrecord_dir=config.tfrecord_dir,
-        subset='train'
+        subset='eval'
     )
 
 

@@ -80,9 +80,10 @@ def tf_image_whitening(img_tensor):
 
 class Read_Tfrecord:
 
-    def __init__(self, tfrecord_dir, anchors):
+    def __init__(self, tfrecord_dir, anchors, subset='train'):
         self.tfrecord_dir = tfrecord_dir
         self.anchors = anchors
+        self.subset = subset
 
     def parser(self, serialized_example):
         features = tf.parse_single_example(
@@ -134,7 +135,8 @@ class Read_Tfrecord:
         return image, label
 
     def make_batch(self, batch_size):
-        tfrecord_fpath_list = [os.path.join(self.tfrecord_dir, fn) for fn in os.listdir(self.tfrecord_dir)]
+        tfrecord_fn_list = [fn for fn in os.listdir(self.tfrecord_dir) if self.subset in fn]
+        tfrecord_fpath_list = [os.path.join(self.tfrecord_dir, fn) for fn in tfrecord_fn_list]
 
         dataset = tf.data.TFRecordDataset(filenames=tfrecord_fpath_list)
         dataset = dataset.map(self.parser, num_parallel_calls=1)

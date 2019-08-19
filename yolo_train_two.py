@@ -25,7 +25,7 @@ def yolo3_model(mode, feature, label, batch_size):
 
         # calc l2 loss
         l2_loss = tf.Variable(initial_value=0, dtype=tf.float32, trainable=False)
-        for scope_name in ['CNN_Net', 'RNN_Net' 'FC_Net']:
+        for scope_name in ['yolo3_net']:
             net_tv = tf.trainable_variables(scope=scope_name)
             r_lambda = 0.001
             regularization_cost = r_lambda * tf.reduce_sum([tf.nn.l2_loss(v) for v in net_tv])
@@ -150,10 +150,12 @@ def main():
     tfrecord_dir = config.tfrecord_dir
 
     train_spec = tf.estimator.TrainSpec(input_fn=lambda: define_input_fn.my_input_fn(data_dir=tfrecord_dir,
+                                                                                     subset='train',
                                                                                      batch_size=BATCH_SIZE),
                                         max_steps=train_steps)
 
     eval_spec = tf.estimator.EvalSpec(input_fn=lambda: define_input_fn.my_input_fn(data_dir=tfrecord_dir,
+                                                                                   subset='eval',
                                                                                    batch_size=BATCH_SIZE),
                                       steps=eval_steps,
                                       start_delay_secs=1)

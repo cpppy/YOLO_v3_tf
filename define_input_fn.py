@@ -7,13 +7,13 @@ from data_process import load_dataset
 
 
 def my_input_fn(data_dir,
-                # subset='Train',
+                subset='train',
                 # num_shards=0,
                 batch_size=4):
     with tf.device('/cpu:0'):
         # use_distortion = subset == 'train' and use_distortion_for_training
         anchors = config.anchors
-        dataset = load_dataset.Read_Tfrecord(tfrecord_dir=data_dir, anchors=anchors)
+        dataset = load_dataset.Read_Tfrecord(tfrecord_dir=data_dir, anchors=anchors, subset=subset)
         input_data, input_labels = dataset.make_batch(batch_size)
         return input_data, input_labels
 

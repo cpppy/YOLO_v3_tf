@@ -7,7 +7,7 @@ print('project_root_path: ', proj_root_path)
 
 # YOLO_v3 model parameters
 
-Dataset_name = 'weche_train'
+Dataset_name = 'weche_data'
 
 train_data_dir = '/data/data/weche_train_data'
 tfrecord_dir = '/data/data/weche_tfrecords'
@@ -23,7 +23,7 @@ train_summary_dir = './train_summary'
 dev_mode=True
 config_fpath = './train_config.json'
 
-# batch_size = 1
+batch_size = 2
 
 data_format = 'NHWC'
 

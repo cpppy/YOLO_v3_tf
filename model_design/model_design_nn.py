@@ -13,69 +13,70 @@ n_feature_map_channel = 3 * (5 + len(cls_dict.label_num_dict))
 
 
 def yolo3_net(inputs):
-    # ---------------- darknet ------------------
-    route_1, route_2, route_3 = darknet_base.darknet_53(inputs=inputs)
-    print('darknet output: ')
-    print(route_1.get_shape().as_list())
-    print(route_2.get_shape().as_list())
-    print(route_3.get_shape().as_list())
+    with tf.variable_scope('yolo3_net'):
+        # ---------------- darknet ------------------
+        route_1, route_2, route_3 = darknet_base.darknet_53(inputs=inputs)
+        print('darknet output: ')
+        print(route_1.get_shape().as_list())
+        print(route_2.get_shape().as_list())
+        print(route_3.get_shape().as_list())
 
-    # ---------------- branch 1 ------------------
-    branch_1, block_out_1 = darknet_base.yolo_block(inputs=route_3, filters=512)
-    feature_map_1 = tf.keras.layers.Conv2D(filters=n_feature_map_channel,
-                                   kernel_size=(1, 1),
-                                   strides=(1, 1),
-                                   name='%s_%s' % ('branch1', 'conv1_1')
-                                   )(block_out_1)
+        # ---------------- branch 1 ------------------
+        branch_1, block_out_1 = darknet_base.yolo_block(inputs=route_3, filters=512)
+        feature_map_1 = tf.keras.layers.Conv2D(filters=n_feature_map_channel,
+                                       kernel_size=(1, 1),
+                                       strides=(1, 1),
+                                       name='%s_%s' % ('branch1', 'conv1_1')
+                                       )(block_out_1)
 
-    # feature_map_1 = tf.identity(feature_map_1, name='feature_map_1')
+        # feature_map_1 = tf.identity(feature_map_1, name='feature_map_1')
 
-    # ------------------- branch 2 --------------------
-    conv2 = darknet_base.conv2d(inputs=branch_1,
-                                filters=256,
-                                kernel_size=1,
-                                strides=1,
-                                name='%s_%s' % ('branch2', 'conv2_1')
-                                )
+        # ------------------- branch 2 --------------------
+        conv2 = darknet_base.conv2d(inputs=branch_1,
+                                    filters=256,
+                                    kernel_size=1,
+                                    strides=1,
+                                    name='%s_%s' % ('branch2', 'conv2_1')
+                                    )
 
-    upsample_2 = darknet_base.upsample_layer(conv2, route_2.get_shape().as_list())
+        upsample_2 = darknet_base.upsample_layer(conv2, route_2.get_shape().as_list())
 
-    concat_2 = tf.concat([upsample_2, route_2], axis=3)
+        concat_2 = tf.concat([upsample_2, route_2], axis=3)
 
-    branch_2, block_out_2 = darknet_base.yolo_block(inputs=concat_2, filters=256)
-    feature_map_2 = tf.keras.layers.Conv2D(filters=n_feature_map_channel,
-                                           kernel_size=(1, 1),
-                                           strides=(1, 1),
-                                           name='branch2_conv2_2'
-                                           )(block_out_2)
+        branch_2, block_out_2 = darknet_base.yolo_block(inputs=concat_2, filters=256)
+        feature_map_2 = tf.keras.layers.Conv2D(filters=n_feature_map_channel,
+                                               kernel_size=(1, 1),
+                                               strides=(1, 1),
+                                               name='branch2_conv2_2'
+                                               )(block_out_2)
 
-    # feature_map_2 = tf.identity(feature_map_2, name='feature_map_2')
+        # feature_map_2 = tf.identity(feature_map_2, name='feature_map_2')
 
-    # --------------------- branch 3 ---------------------
-    conv3 = darknet_base.conv2d(inputs=branch_2,
-                                filters=128,
-                                kernel_size=1,
-                                strides=1,
-                                name='brank3_conv3_1'
-                                )
-    upsample_3 = darknet_base.upsample_layer(inputs=conv3, out_shape=route_1.get_shape().as_list())
+        # --------------------- branch 3 ---------------------
+        conv3 = darknet_base.conv2d(inputs=branch_2,
+                                    filters=128,
+                                    kernel_size=1,
+                                    strides=1,
+                                    name='brank3_conv3_1'
+                                    )
+        upsample_3 = darknet_base.upsample_layer(inputs=conv3, out_shape=route_1.get_shape().as_list())
 
-    concat_3 = tf.concat([upsample_3, route_1], axis=3)
+        concat_3 = tf.concat([upsample_3, route_1], axis=3)
 
-    _, block_out_3 = darknet_base.yolo_block(inputs=concat_3, filters=128)
+        _, block_out_3 = darknet_base.yolo_block(inputs=concat_3, filters=128)
 
-    feature_map_3 = tf.layers.Conv2D(filters=n_feature_map_channel,
-                                     kernel_size=(1, 1),
-                                     strides=(1, 1),
-                                     name='branch3_conv3_2'
-                                     )(block_out_3)
+        feature_map_3 = tf.layers.Conv2D(filters=n_feature_map_channel,
+                                         kernel_size=(1, 1),
+                                         strides=(1, 1),
+                                         name='branch3_conv3_2'
+                                         )(block_out_3)
 
-    # feature_map_3 = tf.identity(feature_map_3, name='feature_map_3')
+        # feature_map_3 = tf.identity(feature_map_3, name='feature_map_3')
 
-    print('feature_map_1: ', feature_map_1.get_shape().as_list())
-    print('feature_map_2: ', feature_map_2.get_shape().as_list())
-    print('feature_map_3: ', feature_map_3.get_shape().as_list())
-    return feature_map_1, feature_map_2, feature_map_3
+        print('feature_map_1: ', feature_map_1.get_shape().as_list())
+        print('feature_map_2: ', feature_map_2.get_shape().as_list())
+        print('feature_map_3: ', feature_map_3.get_shape().as_list())
+        return feature_map_1, feature_map_2, feature_map_3
 
 
 def gen_bboxes_and_rescale2origin(feature_map, anchors):

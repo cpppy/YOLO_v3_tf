@@ -1,10 +1,10 @@
 # YOLO_v3_tf
-reconstruct yolo_v3 model with tf.estimator for distributed training      
+reconstruct yolo_v3 model with tf.estimator for distributed training         
 
-1.data prepare        
-image_file_path: /data/data/xxx_train_data/images/xxx.jpg
-label_file_path: /data/data/xxx_train_data/labels/xxx.txt
-
+1.data prepare         
+image_file_path: /data/data/xxx_train_data/images/xxx.jpg           
+label_file_path: /data/data/xxx_train_data/labels/xxx.txt            
+            
 2.label content        
 x0,y0,x1,y1,x2,y2,x3,y3,class_name1,class_idx1                    
 x0,y0,x1,y1,x2,y2,x3,y3,class_name2,class_idx2                 

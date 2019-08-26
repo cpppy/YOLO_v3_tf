@@ -20,5 +20,5 @@ python ./gen_tfrecord_multi.py
 4.start training               
 python yolo_train_two.py               
 (using estimator in tensorflow==1.14 & python3.7)                 
-test on a distributed training system (4*(4*tesla_P40))             
+test on a distributed training system with a configuration of 4*(4*tesla_P40)         
               
